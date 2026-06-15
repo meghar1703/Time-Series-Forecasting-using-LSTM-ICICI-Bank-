@@ -17,7 +17,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("📈 NIFTY-50 Time Series Forecasting using LSTM")
+st.title("Time Series Forecasting using LSTM ")
 
 uploaded_file = st.file_uploader(
     "Upload Stock CSV",
@@ -25,10 +25,6 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file:
-
-    # =========================
-    # LOAD DATA
-    # =========================
     df = pd.read_csv(uploaded_file)
 
     st.subheader("Dataset Preview")
@@ -52,9 +48,6 @@ if uploaded_file:
 
     data = df[features].values.astype(np.float32)
 
-    # =========================
-    # SCALING
-    # =========================
     scaler = StandardScaler()
 
     split = int(len(data) * 0.8)
@@ -65,9 +58,6 @@ if uploaded_file:
     INPUT_STEPS = 15
     OUTPUT_STEPS = 5
 
-    # =========================
-    # CREATE SEQUENCES
-    # =========================
     def create_sequences(data):
 
         X = []
@@ -96,9 +86,6 @@ if uploaded_file:
         dtype=torch.float32
     )
 
-    # =========================
-    # MODEL
-    # =========================
     class RNNModel(nn.Module):
 
         def __init__(self):
@@ -132,9 +119,6 @@ if uploaded_file:
                 self.num_features
             )
 
-    # =========================
-    # LOAD MODEL
-    # =========================
     model = RNNModel()
 
     model.load_state_dict(
@@ -146,9 +130,6 @@ if uploaded_file:
 
     model.eval()
 
-    # =========================
-    # PREDICTIONS
-    # =========================
     with torch.no_grad():
 
         preds = model(X_test).numpy()
@@ -164,9 +145,6 @@ if uploaded_file:
         y_flat
     )
 
-    # =========================
-    # OVERALL METRICS
-    # =========================
     st.subheader("Overall Metrics")
 
     mse = mean_squared_error(
@@ -207,9 +185,6 @@ if uploaded_file:
     col2.metric("MAPE", f"{mape:.2f}%")
     col3.metric("Accuracy", f"{acc:.2f}%")
 
-    # =========================
-    # PER FEATURE METRICS
-    # =========================
     st.subheader("Per Feature Metrics")
 
     metric_rows = []
@@ -232,9 +207,6 @@ if uploaded_file:
 
     st.dataframe(metric_df)
 
-    # =========================
-    # ALL FEATURE PLOTS
-    # =========================
     st.subheader("All Feature Predictions")
 
     fig, axes = plt.subplots(
@@ -267,9 +239,6 @@ if uploaded_file:
 
     st.pyplot(fig)
 
-    # =========================
-    # CLOSE PRICE PLOT
-    # =========================
     st.subheader(
         "Close Price Forecast"
     )
@@ -295,9 +264,6 @@ if uploaded_file:
 
     st.pyplot(fig2)
 
-    # =========================
-    # DOWNLOAD PREDICTIONS
-    # =========================
     pred_df = pd.DataFrame(
         inv_preds,
         columns=features
