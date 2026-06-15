@@ -1,6 +1,7 @@
 streamlit
-tensorflow
-opencv-python
-pillow
+torch
 numpy
-h5py
+pandas
+matplotlib
+scikit-learn
+joblib
