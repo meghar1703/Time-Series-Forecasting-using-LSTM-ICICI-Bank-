@@ -87,42 +87,36 @@ if uploaded_file:
         dtype=torch.float32
     )
 
-    class LSTMModel(nn.Module):
+    class RNNModel(nn.Module):
+    def __init__(self):
+        super().__init__()
 
-        def __init__(self):
-            super().__init__()
+        self.rnn = nn.LSTM(
+            input_size=11,
+            hidden_size=64,
+            batch_first=True
+        )
 
-            self.lstm=nn.LSTM(
-                input_size=11,
-                hidden_size=192,
-                num_layers=2,
-                batch_first=True,
-                dropout=0.2
-            )
+        self.fc = nn.Linear(
+            64,
+            5 * 11
+        )
 
-            self.fc=nn.Linear(
-                192,
-                OUTPUT_STEPS*11
-            )
+        self.output_steps = 5
+        self.num_features = 11
 
-        def forward(self,x):
+    def forward(self, x):
+        out, _ = self.rnn(x)
+        out = out[:, -1, :]
+        out = self.fc(out)
 
-            out,_=self.lstm(x)
+        return out.view(
+            -1,
+            self.output_steps,
+            self.num_features
+        )
 
-            last=out[:,-1,:]
-            mean=torch.mean(out,dim=1)
-
-            out=last+mean
-
-            out=self.fc(out)
-
-            return out.view(
-                -1,
-                OUTPUT_STEPS,
-                11
-            )
-
-    model=LSTMModel()
+model = RNNModel()
 
     model.load_state_dict(
         torch.load(
